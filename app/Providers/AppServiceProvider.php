@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Listeners\RequireCredentials;
 use App\Support\Credentials;
 use Illuminate\Console\Command;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 use Spatie\OpenApiCli\Facades\OpenApiCli;
@@ -36,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->attachWethodHeaders();
+
+        Event::listen(CommandStarting::class, RequireCredentials::class);
     }
 
     /**

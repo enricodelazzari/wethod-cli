@@ -50,7 +50,7 @@ class Credentials
      */
     public static function store(): Valuestore
     {
-        return Valuestore::make(self::path());
+        return PrettyValuestore::make(self::path());
     }
 
     /**
@@ -74,7 +74,21 @@ class Credentials
 
         @chmod($path, 0600);
 
-        return Valuestore::make($path);
+        return PrettyValuestore::make($path);
+    }
+
+    /**
+     * Required credentials that are not configured (empty config values),
+     * in display order. An empty array means everything needed is present.
+     *
+     * @return list<string>
+     */
+    public static function missing(): array
+    {
+        return array_keys(array_filter([
+            'company' => ! config('wethod.company'),
+            'token' => ! config('wethod.token'),
+        ]));
     }
 
     /**

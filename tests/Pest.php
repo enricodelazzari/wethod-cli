@@ -1,5 +1,7 @@
 <?php
 
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +13,22 @@
 |
 */
 
-uses(Tests\TestCase::class)->in('Feature');
+uses(TestCase::class)->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Test Spec
+|--------------------------------------------------------------------------
+|
+| Point every booted application at a tiny local OpenAPI fixture so the
+| suite never fetches the real spec over the network.
+|
+*/
+
+$specFixture = __DIR__.'/Fixtures/mini-openapi.yaml';
+putenv('WETHOD_SPEC_URL='.$specFixture);
+$_ENV['WETHOD_SPEC_URL'] = $specFixture;
+$_SERVER['WETHOD_SPEC_URL'] = $specFixture;
 
 /*
 |--------------------------------------------------------------------------

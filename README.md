@@ -1,41 +1,87 @@
-<p align="center">
-    <img title="Laravel Zero" height="100" src="https://raw.githubusercontent.com/laravel-zero/docs/master/images/logo/laravel-zero-readme.png" alt="Laravel Zero Logo" />
-</p>
+# Wethod CLI
 
-<p align="center">
-  <a href="https://github.com/laravel-zero/framework/actions"><img src="https://github.com/laravel-zero/laravel-zero/actions/workflows/tests.yml/badge.svg" alt="Build Status" /></a>
-  <a href="https://packagist.org/packages/laravel-zero/framework"><img src="https://img.shields.io/packagist/dt/laravel-zero/framework.svg" alt="Total Downloads" /></a>
-  <a href="https://packagist.org/packages/laravel-zero/framework"><img src="https://img.shields.io/packagist/v/laravel-zero/framework.svg?label=stable" alt="Latest Stable Version" /></a>
-  <a href="https://packagist.org/packages/laravel-zero/framework"><img src="https://img.shields.io/packagist/l/laravel-zero/framework.svg" alt="License" /></a>
-</p>
+A standalone command-line client for the [Wethod API](https://docs.wethod.com/getting-started), built with
+[Laravel Zero](https://laravel-zero.com) and [spatie/laravel-openapi-cli](https://github.com/spatie/laravel-openapi-cli).
 
-Laravel Zero was created by [Nuno Maduro](https://github.com/nunomaduro) and [Owen Voke](https://github.com/owenvoke), and is a micro-framework that provides an elegant starting point for your console application. It is an **unofficial** and customized version of Laravel optimized for building command-line applications.
+Every endpoint in the Wethod [OpenAPI spec](https://docs.wethod.com/specs/openapi.yaml) becomes its own
+`wethod:*` command. Authentication and the required `Wethod-Company` / `Wethod-Version` headers are added to
+every request automatically.
 
-- Built on top of the [Laravel](https://laravel.com) components.
-- Optional installation of Laravel [Eloquent](https://laravel-zero.com/docs/database/), Laravel [Logging](https://laravel-zero.com/docs/logging/) and many others.
-- Supports interactive [menus](https://laravel-zero.com/docs/build-interactive-menus/) and [desktop notifications](https://laravel-zero.com/docs/send-desktop-notifications/) on Linux, Windows & MacOS.
-- Ships with a [Scheduler](https://laravel-zero.com/docs/task-scheduling/) and  a [Standalone Compiler](https://laravel-zero.com/docs/build-a-standalone-application/).
-- Integration with [Collision](https://github.com/nunomaduro/collision) - Beautiful error reporting
-- Follow the creator Nuno Maduro:
-    - YouTube: **[youtube.com/@nunomaduro](https://www.youtube.com/@nunomaduro)** — Videos every weekday
-    - Twitch: **[twitch.tv/enunomaduro](https://www.twitch.tv/enunomaduro)** — Streams (almost) every weekday
-    - Twitter / X: **[x.com/enunomaduro](https://x.com/enunomaduro)**
-    - LinkedIn: **[linkedin.com/in/nunomaduro](https://www.linkedin.com/in/nunomaduro)**
-    - Instagram: **[instagram.com/enunomaduro](https://www.instagram.com/enunomaduro)**
-    - Tiktok: **[tiktok.com/@enunomaduro](https://www.tiktok.com/@enunomaduro)**
+## Requirements
 
-------
+- PHP 8.2+
+- Composer
 
-## Documentation
+## Install
 
-For full documentation, visit [laravel-zero.com](https://laravel-zero.com/).
+```bash
+composer install
+```
 
-## Support the development
-**Do you like this project? Support it by donating**
+This creates the `wethod` executable in the project root. Run it with `php wethod` (or `./wethod`).
 
-- PayPal: [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=66BYDWAT92N6L)
-- Patreon: [Donate](https://www.patreon.com/nunomaduro)
+## Configure
 
-## License
+Store your credentials once:
 
-Laravel Zero is an open-source software licensed under the MIT license.
+```bash
+php wethod wethod:configure
+```
+
+You'll be asked for:
+
+- **Company endpoint** — the subdomain of your Wethod URL (e.g. `acme` from `acme.wethod.com`)
+- **API token** — a personal token from your Wethod *Account settings*
+- **API version** — defaults to `2024-06-15`
+
+Credentials are saved to `~/.config/wethod/credentials.json` (readable only by you). Review them with:
+
+```bash
+php wethod wethod:configure --show
+```
+
+Environment variables override the stored values when set: `WETHOD_TOKEN`, `WETHOD_COMPANY`,
+`WETHOD_VERSION`, `WETHOD_BASE_URL`, `WETHOD_SPEC_URL`.
+
+## Usage
+
+List every available command:
+
+```bash
+php wethod wethod:list
+```
+
+Examples:
+
+```bash
+# Query parameters become options
+php wethod wethod:list-clients --limit=10
+
+# Path parameters become options
+php wethod wethod:get-client --id=42
+
+# Request bodies: raw JSON...
+php wethod wethod:approve-budget --id=123 --input='{"comment":"Looks good"}'
+
+# ...or repeated key=value fields
+php wethod wethod:create-budget-area --field name="Production" --field budget_id=5
+```
+
+Output options: `--json`, `--yaml`, `--minify`, `-H` (include response headers). Pass `-vvv` to print the
+outgoing request (method, URL, headers, body) for debugging.
+
+## Maintenance
+
+The OpenAPI spec is fetched once and cached. Force a refresh with:
+
+```bash
+php wethod wethod:spec:refresh
+```
+
+## Development
+
+```bash
+./vendor/bin/pest      # run the test suite
+./vendor/bin/pint      # format code
+php wethod app:build   # build a standalone PHAR
+```

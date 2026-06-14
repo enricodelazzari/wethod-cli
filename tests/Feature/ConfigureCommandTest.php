@@ -18,7 +18,7 @@ afterEach(function () {
 });
 
 it('writes credentials to disk with owner-only permissions', function () {
-    $this->artisan('wethod:configure')
+    $this->artisan('configure')
         ->expectsQuestion('Company endpoint', 'acme')
         ->expectsQuestion('API token', 'tok_secret_123')
         ->expectsQuestion('API version', '2024-06-15')
@@ -47,7 +47,7 @@ it('shows the masked token with --show', function () {
         'version' => '2024-06-15',
     ]);
 
-    $this->artisan('wethod:configure --show')
+    $this->artisan('configure --show')
         ->assertExitCode(0)
         ->expectsOutputToContain('acme')
         ->expectsOutputToContain('****_123');

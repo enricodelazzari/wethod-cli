@@ -24,7 +24,7 @@ return [
     |
     | The base URL all requests are sent to, plus the credentials and headers
     | Wethod requires on every request. `token` and `company` are normally
-    | set through `wethod:configure`; environment variables override them.
+    | set through `wethod configure`; environment variables override them.
     |
     */
 

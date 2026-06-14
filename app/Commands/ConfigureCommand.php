@@ -8,7 +8,7 @@ use Spatie\Valuestore\Valuestore;
 
 class ConfigureCommand extends Command
 {
-    protected $signature = 'wethod:configure {--show : Display the current configuration instead of editing it}';
+    protected $signature = 'configure {--show : Display the current configuration instead of editing it}';
 
     protected $description = 'Set up your Wethod API token, company and version';
 

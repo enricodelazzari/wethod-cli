@@ -4,7 +4,7 @@ A standalone command-line client for the [Wethod API](https://docs.wethod.com/ge
 [Laravel Zero](https://laravel-zero.com) and [spatie/laravel-openapi-cli](https://github.com/spatie/laravel-openapi-cli).
 
 Every endpoint in the Wethod [OpenAPI spec](https://docs.wethod.com/specs/openapi.yaml) becomes its own
-`wethod:*` command. Authentication and the required `Wethod-Company` / `Wethod-Version` headers are added to
+command. Authentication and the required `Wethod-Company` / `Wethod-Version` headers are added to
 every request automatically.
 
 ## Requirements
@@ -25,7 +25,7 @@ This creates the `wethod` executable in the project root. Run it with `php wetho
 Store your credentials once:
 
 ```bash
-php wethod wethod:configure
+php wethod configure
 ```
 
 You'll be asked for:
@@ -37,7 +37,7 @@ You'll be asked for:
 Credentials are saved to `~/.config/wethod/credentials.json` (readable only by you). Review them with:
 
 ```bash
-php wethod wethod:configure --show
+php wethod configure --show
 ```
 
 Environment variables override the stored values when set: `WETHOD_TOKEN`, `WETHOD_COMPANY`,
@@ -48,23 +48,23 @@ Environment variables override the stored values when set: `WETHOD_TOKEN`, `WETH
 List every available command:
 
 ```bash
-php wethod wethod:list
+php wethod list
 ```
 
 Examples:
 
 ```bash
 # Query parameters become options
-php wethod wethod:list-clients --limit=10
+php wethod list-clients --limit=10
 
 # Path parameters become options
-php wethod wethod:get-client --id=42
+php wethod get-client --id=42
 
 # Request bodies: raw JSON...
-php wethod wethod:approve-budget --id=123 --input='{"comment":"Looks good"}'
+php wethod approve-budget --id=123 --input='{"comment":"Looks good"}'
 
 # ...or repeated key=value fields
-php wethod wethod:create-budget-area --field name="Production" --field budget_id=5
+php wethod create-budget-area --field name="Production" --field budget_id=5
 ```
 
 Output options: `--json`, `--yaml`, `--minify`, `-H` (include response headers). Pass `-vvv` to print the
@@ -75,7 +75,7 @@ outgoing request (method, URL, headers, body) for debugging.
 The OpenAPI spec is fetched once and cached. Force a refresh with:
 
 ```bash
-php wethod wethod:spec:refresh
+php wethod spec:refresh
 ```
 
 ## Development

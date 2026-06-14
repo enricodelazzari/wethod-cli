@@ -7,7 +7,7 @@ use LaravelZero\Framework\Commands\Command;
 
 class SpecRefreshCommand extends Command
 {
-    protected $signature = 'wethod:spec:refresh';
+    protected $signature = 'spec:refresh';
 
     protected $description = 'Clear the cached OpenAPI spec so it is re-fetched on the next run';
 

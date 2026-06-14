@@ -13,7 +13,7 @@ it('sends the bearer token and required Wethod headers', function () {
         'api.wethod.com/*' => Http::response([], 200),
     ]);
 
-    $this->artisan('wethod:list-clients')->assertExitCode(0);
+    $this->artisan('list-clients')->assertExitCode(0);
 
     Http::assertSent(function ($request) {
         return $request->hasHeader('Authorization', 'Bearer secret-token')
@@ -23,5 +23,5 @@ it('sends the bearer token and required Wethod headers', function () {
 });
 
 it('registers a command for each operation in the spec', function () {
-    $this->artisan('wethod:list-clients', ['--help' => true])->assertExitCode(0);
+    $this->artisan('list-clients', ['--help' => true])->assertExitCode(0);
 });

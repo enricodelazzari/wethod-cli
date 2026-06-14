@@ -53,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Turn the Wethod OpenAPI spec into `wethod:*` commands.
+     * Turn the Wethod OpenAPI spec into top-level commands.
      */
     private function registerEndpointCommands(): void
     {
@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
         // (e.g. across the test suite) don't accumulate duplicates.
         OpenApiCli::clearRegistrations();
 
-        OpenApiCli::register(config('wethod.spec_url'), 'wethod')
+        OpenApiCli::register(config('wethod.spec_url'))
             ->baseUrl(config('wethod.base_url'))
             ->auth(fn () => config('wethod.token'))
             ->cache(ttl: config('wethod.spec_cache_ttl'))

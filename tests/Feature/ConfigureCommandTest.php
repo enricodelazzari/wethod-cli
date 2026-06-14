@@ -41,7 +41,7 @@ it('writes credentials to disk with owner-only permissions', function () {
 });
 
 it('shows the masked token with --show', function () {
-    Credentials::save([
+    Credentials::writableStore()->put([
         'company' => 'acme',
         'token' => 'tok_secret_123',
         'version' => '2024-06-15',

@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Spatie\Valuestore\Valuestore;
+
 class Credentials
 {
     /**
@@ -43,29 +45,20 @@ class Credentials
     }
 
     /**
-     * Load the stored credentials, or an empty array if none exist.
-     *
-     * @return array<string, mixed>
+     * A read-only credentials store. Reading never touches the filesystem,
+     * so env-only users don't get an empty credentials file created.
      */
-    public static function load(): array
+    public static function store(): Valuestore
     {
-        $path = self::path();
-
-        if (! is_file($path)) {
-            return [];
-        }
-
-        $decoded = json_decode((string) file_get_contents($path), true);
-
-        return is_array($decoded) ? $decoded : [];
+        return Valuestore::make(self::path());
     }
 
     /**
-     * Persist credentials to disk with owner-only permissions.
-     *
-     * @param  array<string, mixed>  $data
+     * A credentials store whose file is pre-created with owner-only
+     * permissions (dir 0700, file 0600). file_put_contents preserves the
+     * permissions of an existing file, so subsequent writes stay 0600.
      */
-    public static function save(array $data): void
+    public static function writableStore(): Valuestore
     {
         $dir = self::configDir();
 
@@ -75,11 +68,12 @@ class Credentials
 
         $path = self::path();
 
-        file_put_contents(
-            $path,
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL
-        );
+        if (! file_exists($path)) {
+            touch($path);
+        }
 
         @chmod($path, 0600);
+
+        return Valuestore::make($path);
     }
 }

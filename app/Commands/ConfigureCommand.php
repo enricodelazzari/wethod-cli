@@ -4,6 +4,7 @@ namespace App\Commands;
 
 use App\Support\Credentials;
 use LaravelZero\Framework\Commands\Command;
+use Spatie\Valuestore\Valuestore;
 
 class ConfigureCommand extends Command
 {
@@ -13,14 +14,14 @@ class ConfigureCommand extends Command
 
     public function handle(): int
     {
-        $current = Credentials::load();
+        $current = Credentials::store();
 
         if ($this->option('show')) {
             return $this->showConfiguration($current);
         }
 
         $this->line('The company endpoint is the subdomain of your Wethod URL, e.g. "acme" from acme.wethod.com.');
-        $company = trim((string) $this->ask('Company endpoint', $current['company'] ?? config('wethod.company')));
+        $company = trim((string) $this->ask('Company endpoint', $current->get('company') ?? config('wethod.company')));
 
         if ($company === '') {
             $this->error('A company endpoint is required.');
@@ -28,13 +29,13 @@ class ConfigureCommand extends Command
             return self::FAILURE;
         }
 
-        $hasToken = ! empty($current['token']);
+        $hasToken = $current->has('token');
         $token = (string) $this->secret(
             'API token'.($hasToken ? ' (leave blank to keep the current one)' : '')
         );
 
         if ($token === '' && $hasToken) {
-            $token = (string) $current['token'];
+            $token = (string) $current->get('token');
         }
 
         if ($token === '') {
@@ -43,9 +44,9 @@ class ConfigureCommand extends Command
             return self::FAILURE;
         }
 
-        $version = trim((string) $this->ask('API version', $current['version'] ?? config('wethod.version')));
+        $version = trim((string) $this->ask('API version', $current->get('version') ?? config('wethod.version')));
 
-        Credentials::save([
+        Credentials::writableStore()->put([
             'company' => $company,
             'token' => $token,
             'version' => $version,
@@ -58,17 +59,14 @@ class ConfigureCommand extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * @param  array<string, mixed>  $current
-     */
-    private function showConfiguration(array $current): int
+    private function showConfiguration(Valuestore $current): int
     {
-        $token = (string) ($current['token'] ?? config('wethod.token') ?? '');
+        $token = (string) ($current->get('token') ?? config('wethod.token') ?? '');
 
         $this->table(['Setting', 'Value'], [
-            ['Company', (string) ($current['company'] ?? config('wethod.company') ?? '—')],
+            ['Company', (string) ($current->get('company') ?? config('wethod.company') ?? '—')],
             ['Token', $token === '' ? '—' : $this->maskToken($token)],
-            ['Version', (string) ($current['version'] ?? config('wethod.version'))],
+            ['Version', (string) ($current->get('version') ?? config('wethod.version'))],
             ['Base URL', (string) config('wethod.base_url')],
             ['Credentials file', Credentials::path()],
         ]);

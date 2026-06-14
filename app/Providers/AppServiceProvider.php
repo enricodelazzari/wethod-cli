@@ -43,12 +43,12 @@ class AppServiceProvider extends ServiceProvider
      */
     private function resolveCredentials(): void
     {
-        $creds = Credentials::load();
+        $creds = Credentials::store();
 
         config([
-            'wethod.token' => config('wethod.token') ?: ($creds['token'] ?? null),
-            'wethod.company' => config('wethod.company') ?: ($creds['company'] ?? null),
-            'wethod.version' => config('wethod.version') ?: ($creds['version'] ?? null) ?: self::DEFAULT_VERSION,
+            'wethod.token' => config('wethod.token') ?: $creds->get('token'),
+            'wethod.company' => config('wethod.company') ?: $creds->get('company'),
+            'wethod.version' => config('wethod.version') ?: $creds->get('version') ?: self::DEFAULT_VERSION,
         ]);
     }
 

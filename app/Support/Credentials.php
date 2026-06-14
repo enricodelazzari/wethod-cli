@@ -11,9 +11,9 @@ class Credentials
      */
     public static function homeDir(): string
     {
-        $home = getenv('HOME') ?: getenv('USERPROFILE');
+        $home = self::env('HOME') ?? self::env('USERPROFILE');
 
-        return $home !== false && $home !== '' ? rtrim($home, '/\\') : sys_get_temp_dir();
+        return $home !== null ? rtrim($home, '/\\') : sys_get_temp_dir();
     }
 
     /**
@@ -21,9 +21,9 @@ class Credentials
      */
     public static function configDir(): string
     {
-        $xdg = getenv('XDG_CONFIG_HOME');
+        $xdg = self::env('XDG_CONFIG_HOME');
 
-        $base = $xdg !== false && $xdg !== '' ? rtrim($xdg, '/\\') : self::homeDir().'/.config';
+        $base = $xdg !== null ? rtrim($xdg, '/\\') : self::homeDir().'/.config';
 
         return $base.'/wethod';
     }
@@ -75,5 +75,15 @@ class Credentials
         @chmod($path, 0600);
 
         return Valuestore::make($path);
+    }
+
+    /**
+     * Read an environment variable, treating unset and empty as absent.
+     */
+    private static function env(string $name): ?string
+    {
+        $value = getenv($name);
+
+        return $value !== false && $value !== '' ? $value : null;
     }
 }

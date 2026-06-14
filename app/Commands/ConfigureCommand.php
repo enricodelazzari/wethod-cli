@@ -54,7 +54,7 @@ class ConfigureCommand extends Command
 
         $this->newLine();
         $this->info('Credentials saved to '.Credentials::path());
-        $this->line('Run <comment>wethod wethod:list</comment> to see the available commands.');
+        $this->line('Run <comment>wethod list</comment> to see the available commands.');
 
         return self::SUCCESS;
     }

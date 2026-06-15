@@ -2,12 +2,13 @@ name: release
 
 on:
   release:
-    types: [published]
+    types: [created]
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Tag to build (e.g. v0.1.0)'
+      version:
+        description: 'Version to publish (e.g. v0.1.0)'
         required: true
+        type: string
 
 permissions:
   contents: write
@@ -16,46 +17,66 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    name: Build and publish the PHAR
+    name: Build and publish binaries
 
     steps:
-      - name: Resolve the tag
-        id: tag
+      - name: Extract the tag version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="${{ github.event.inputs.tag }}"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           else
-            TAG="${{ github.ref_name }}"
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
           fi
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout the code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.tag.outputs.tag }}
+          ref: ${{ env.VERSION }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.4'
           extensions: dom, curl, libxml, mbstring, zip
+          ini-values: error_reporting=E_ALL, phar.readonly=Off
           tools: composer:v2
           coverage: none
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Build the PHAR
-        run: php wethod app:build wethod --build-version=${{ steps.tag.outputs.version }} --no-interaction
+      - name: Build PHAR
+        run: |
+          php wethod app:build wethod --build-version=${{ env.VERSION }} --no-interaction
+          mv builds/wethod builds/wethod.phar
 
-      - name: Upload the PHAR artifact
+      - name: Build binaries for all platforms
+        run: ./vendor/bin/phpacker build --src=./builds/wethod.phar --php=8.4 all
+
+      - name: Rename binaries with version
+        run: |
+          cd builds/build
+          mv mac/mac-arm wethod-${{ env.VERSION }}-darwin-arm64
+          mv mac/mac-x64 wethod-${{ env.VERSION }}-darwin-x64
+          mv linux/linux-arm wethod-${{ env.VERSION }}-linux-arm64
+          mv linux/linux-x64 wethod-${{ env.VERSION }}-linux-x64
+          mv windows/windows-x64.exe wethod-${{ env.VERSION }}-windows-x64.exe
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wethod
-          path: builds/wethod
+          name: binaries
+          path: |
+            builds/build/wethod-*
 
-      - name: Upload the PHAR to the release
-        run: gh release upload "${{ steps.tag.outputs.tag }}" builds/wethod --clobber
+      - name: Upload binaries to release
+        run: |
+          cd builds/build
+          gh release upload ${{ env.VERSION }} \
+            wethod-${{ env.VERSION }}-darwin-arm64 \
+            wethod-${{ env.VERSION }}-darwin-x64 \
+            wethod-${{ env.VERSION }}-linux-arm64 \
+            wethod-${{ env.VERSION }}-linux-x64 \
+            wethod-${{ env.VERSION }}-windows-x64.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

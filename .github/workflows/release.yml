@@ -63,7 +63,7 @@ jobs:
           mv windows/windows-x64.exe wethod-${{ env.VERSION }}-windows-x64.exe
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: binaries
           path: |

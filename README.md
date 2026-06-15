@@ -20,28 +20,33 @@ composer install
 
 This creates the `wethod` executable in the project root. Run it with `php wethod` (or `./wethod`).
 
-## Configure
+## Log in
 
 Store your credentials once:
 
 ```bash
-php wethod configure
+php wethod login
 ```
 
 You'll be asked for:
 
 - **Company endpoint** — the subdomain of your Wethod URL (e.g. `acme` from `acme.wethod.com`)
-- **API token** — a personal token from your Wethod *Account settings*
+- **API token** — a personal token from your Wethod *Account settings* (it's validated before being saved)
 - **API version** — defaults to `2024-06-15`
 
-Credentials are saved to `~/.config/wethod/credentials.json` (readable only by you). Review them with:
+Each company keeps its own token, so you can `login` to several and switch between them. Credentials
+are saved to `~/.config/wethod/credentials.json` (readable only by you). Inspect the active one and
+list stored companies with:
 
 ```bash
-php wethod configure --show
+php wethod auth
 ```
 
+Remove a company's credentials with `php wethod logout [company]`.
+
 Environment variables override the stored values when set: `WETHOD_TOKEN`, `WETHOD_COMPANY`,
-`WETHOD_VERSION`, `WETHOD_BASE_URL`, `WETHOD_SPEC_URL`.
+`WETHOD_VERSION`, `WETHOD_BASE_URL`, `WETHOD_SPEC_URL`. Setting `WETHOD_COMPANY` also selects which
+stored company is active for that invocation.
 
 ## Usage
 
@@ -70,6 +75,15 @@ php wethod create-budget-area --field name="Production" --field budget_id=5
 Output options: `--json`, `--yaml`, `--minify`, `-H` (include response headers). Pass `-vvv` to print the
 outgoing request (method, URL, headers, body) for debugging.
 
+## AI agent skill
+
+The CLI ships with a Claude skill that teaches AI coding assistants how to drive it. Install it into
+the current project (or `--global` for all projects) with:
+
+```bash
+php wethod install-skill
+```
+
 ## Maintenance
 
 The OpenAPI spec is fetched once and cached. Force a refresh with:
@@ -81,7 +95,8 @@ php wethod spec:refresh
 ## Development
 
 ```bash
-./vendor/bin/pest      # run the test suite
-./vendor/bin/pint      # format code
-php wethod app:build   # build a standalone PHAR
+./vendor/bin/pest             # run the test suite
+./vendor/bin/pint             # format code
+./vendor/bin/phpstan analyse  # static analysis
+php wethod app:build          # build a standalone PHAR
 ```

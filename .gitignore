@@ -2,4 +2,6 @@
 /.idea
 /.vscode
 /.vagrant
+/build
+/builds
 .phpunit.result.cache

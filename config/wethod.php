@@ -34,7 +34,9 @@ return [
 
     'company' => env('WETHOD_COMPANY'),
 
-    // Falls back to the default API version in AppServiceProvider when unset.
     'version' => env('WETHOD_VERSION'),
+
+    // Used when no version is configured via env or stored credentials.
+    'default_version' => '2024-06-15',
 
 ];

@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-use App\Support\Credentials;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Foundation\Application;
@@ -11,7 +10,8 @@ use Spatie\OpenApiCli\Commands\EndpointCommand;
 class RequireCredentials
 {
     /**
-     * Human-readable labels for each required credential.
+     * Human-readable labels for each required credential, keyed by the
+     * `wethod.*` config value that must be present.
      *
      * @var array<string, string>
      */
@@ -33,15 +33,19 @@ class RequireCredentials
             return;
         }
 
-        // Only the auto-generated API commands authenticate; leave configure,
-        // spec:refresh, list, help and friends alone.
+        // Only the auto-generated API commands authenticate; leave login,
+        // logout, auth, spec:refresh, list, help and friends alone.
         $command = $this->app->make(Kernel::class)->all()[$event->command] ?? null;
 
         if (! $command instanceof EndpointCommand) {
             return;
         }
 
-        $missing = Credentials::missing();
+        $missing = array_keys(array_filter(
+            self::LABELS,
+            fn (string $label, string $key) => ! config("wethod.{$key}"),
+            ARRAY_FILTER_USE_BOTH,
+        ));
 
         if ($missing === []) {
             return;
@@ -49,6 +53,6 @@ class RequireCredentials
 
         $labels = implode(', ', array_map(fn (string $key) => self::LABELS[$key], $missing));
 
-        abort(1, "No Wethod credentials configured: {$labels}. Run `wethod configure` (or set WETHOD_COMPANY / WETHOD_TOKEN).");
+        abort(1, "No Wethod credentials configured: {$labels}. Run `wethod login` (or set WETHOD_COMPANY / WETHOD_TOKEN).");
     }
 }

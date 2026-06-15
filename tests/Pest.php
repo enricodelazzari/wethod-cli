@@ -1,5 +1,6 @@
 <?php
 
+use Laravel\Prompts\Prompt;
 use Tests\TestCase;
 
 /*
@@ -14,6 +15,19 @@ use Tests\TestCase;
 */
 
 uses(TestCase::class)->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Laravel Prompts fallback
+|--------------------------------------------------------------------------
+|
+| Force Laravel Prompts into their non-interactive fallback so the console
+| testing helpers (expectsQuestion / expectsChoice) can drive prompt-based
+| commands like `login` and `logout`.
+|
+*/
+
+uses()->beforeEach(fn () => Prompt::fallbackWhen(true))->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

@@ -5,6 +5,8 @@ namespace App\Commands;
 use Illuminate\Support\Facades\Cache;
 use LaravelZero\Framework\Commands\Command;
 
+use function Laravel\Prompts\info;
+
 class SpecRefreshCommand extends Command
 {
     protected $signature = 'spec:refresh';
@@ -18,7 +20,7 @@ class SpecRefreshCommand extends Command
         // Matches the cache key built by Spatie\OpenApiCli\SpecResolver.
         Cache::forget('openapi-cli-spec:'.md5($specUrl));
 
-        $this->info('Cached spec cleared. It will be re-fetched on the next command.');
+        info('Cached spec cleared. It will be re-fetched on the next command.');
 
         return self::SUCCESS;
     }

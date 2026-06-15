@@ -1,0 +1,60 @@
+---
+name: wethod
+description: >-
+  Manage Wethod project, budget, client, business-unit and CRM data through the
+  `wethod` CLI. Use when the user wants to list, inspect, create, update or
+  approve Wethod records (clients, contacts, budgets, budget areas, business
+  units, custom fields, payroll), check or refresh credentials, or otherwise
+  talk to a Wethod company from the command line.
+license: MIT
+metadata:
+  author: wethod
+  version: "0.1.0"
+---
+
+# Wethod CLI
+
+The `wethod` CLI exposes every endpoint of the Wethod API as its own command.
+The command set is generated from Wethod's OpenAPI spec, so **discover commands
+at runtime** rather than assuming a fixed list.
+
+## First steps
+
+1. Confirm the user is authenticated: `wethod auth`. If no company is active,
+   tell them to run `wethod login` (it asks for a company subdomain, an API
+   token, and an API version). You cannot do this for them — it needs a secret.
+2. List the available commands: `wethod list`.
+3. Inspect any command before using it: `wethod <command> --help`. The help
+   lists the options that map to path/query parameters and request-body fields.
+
+## Conventions (apply to every API command)
+
+- **Path & query parameters become options**: `wethod get-client --id=42`,
+  `wethod list-clients --limit=10 --offset=0`.
+- **Request bodies** are supplied either as raw JSON via `--input` or as
+  repeated `--field key=value` pairs:
+  - `wethod create-budget-area --field name="Production" --field budget_id=5`
+  - `wethod approve-budget --id=123 --input='{"comment":"Looks good"}'`
+- **Output**: default is human-readable. Use `--json` for machine-readable
+  output (prefer this when you will parse the result), `--yaml`, `--minify`,
+  and `-H` to include response headers. `-vvv` prints the outgoing request for
+  debugging.
+- **Pagination**: list endpoints take `--limit` (max 100) and `--offset`. To
+  read everything, page until a response returns fewer than `--limit` items.
+
+## Output handling
+
+Always pass `--json` when you need to extract a value, then parse with `jq`:
+
+```bash
+wethod list-clients --limit=1 --json | jq '.[0].id'
+```
+
+## Errors
+
+- "No Wethod credentials configured" / a 401 warning → the user must run
+  `wethod login`. Do not retry blindly.
+- A 429 warning means rate-limited; wait the suggested seconds before retrying.
+
+See `references/commands.md` for the command anatomy and `references/workflows.md`
+for multi-step recipes.

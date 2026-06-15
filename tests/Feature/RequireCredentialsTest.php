@@ -13,7 +13,7 @@ it('aborts an API command when credentials are missing, without sending a reques
         $this->fail('Expected the command to abort.');
     } catch (ConsoleException $e) {
         expect($e->getExitCode())->toBe(1)
-            ->and($e->getMessage())->toContain('wethod configure');
+            ->and($e->getMessage())->toContain('wethod login');
     }
 
     Http::assertNothingSent();
@@ -35,8 +35,8 @@ it('does not interfere when credentials are present', function () {
     Http::assertSent(fn ($request) => $request->hasHeader('Wethod-Company', 'acme'));
 });
 
-it('does not block configure when credentials are missing', function () {
+it('does not block auth when credentials are missing', function () {
     config(['wethod.token' => null, 'wethod.company' => null]);
 
-    $this->artisan('configure --show')->assertExitCode(0);
+    $this->artisan('auth')->assertExitCode(0);
 });

@@ -2,8 +2,6 @@
 
 namespace App\Support;
 
-use Spatie\Valuestore\Valuestore;
-
 class Credentials
 {
     /**
@@ -45,56 +43,9 @@ class Credentials
     }
 
     /**
-     * A read-only credentials store. Reading never touches the filesystem,
-     * so env-only users don't get an empty credentials file created.
-     */
-    public static function store(): Valuestore
-    {
-        return PrettyValuestore::make(self::path());
-    }
-
-    /**
-     * A credentials store whose file is pre-created with owner-only
-     * permissions (dir 0700, file 0600). file_put_contents preserves the
-     * permissions of an existing file, so subsequent writes stay 0600.
-     */
-    public static function writableStore(): Valuestore
-    {
-        $dir = self::configDir();
-
-        if (! is_dir($dir)) {
-            mkdir($dir, 0700, true);
-        }
-
-        $path = self::path();
-
-        if (! file_exists($path)) {
-            touch($path);
-        }
-
-        @chmod($path, 0600);
-
-        return PrettyValuestore::make($path);
-    }
-
-    /**
-     * Required credentials that are not configured (empty config values),
-     * in display order. An empty array means everything needed is present.
-     *
-     * @return list<string>
-     */
-    public static function missing(): array
-    {
-        return array_keys(array_filter([
-            'company' => ! config('wethod.company'),
-            'token' => ! config('wethod.token'),
-        ]));
-    }
-
-    /**
      * Read an environment variable, treating unset and empty as absent.
      */
-    private static function env(string $name): ?string
+    public static function env(string $name): ?string
     {
         $value = getenv($name);
 

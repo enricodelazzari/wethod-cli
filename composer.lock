@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3fa4664587d4cb0b4a3385645ce75e39",
+    "content-hash": "d2ef2e47abd6a68ab2180f4acd080d97",
     "packages": [
         {
             "name": "brick/math",
@@ -7847,6 +7847,90 @@
             "time": "2022-02-21T01:04:05+00:00"
         },
         {
+            "name": "phpacker/phpacker",
+            "version": "0.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpacker/phpacker.git",
+                "reference": "c26b7def6578e5a35d4a99dfbb5f4c552bf4f42b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpacker/phpacker/zipball/c26b7def6578e5a35d4a99dfbb5f4c552bf4f42b",
+                "reference": "c26b7def6578e5a35d4a99dfbb5f4c552bf4f42b",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/prompts": "^0.3",
+                "laravel/serializable-closure": "^2.0",
+                "spatie/once": "^3",
+                "symfony/console": "^7",
+                "symfony/event-dispatcher": "^7",
+                "symfony/filesystem": "^7",
+                "symfony/finder": "^7",
+                "vlucas/phpdotenv": "^5.6"
+            },
+            "require-dev": {
+                "cpx/cpx": "^1.0",
+                "laravel/pint": "^1.20",
+                "nunomaduro/collision": "^8.8",
+                "pestphp/pest": "^3.8",
+                "phpstan/phpstan": "^2.1",
+                "symfony/process": "^7.3"
+            },
+            "bin": [
+                "./bin/phpacker"
+            ],
+            "type": "library",
+            "extra": {
+                "thanks": [
+                    {
+                        "url": "https://github.com/crazywhalecc/static-php-cli",
+                        "name": "Static PHP CLI"
+                    },
+                    {
+                        "url": "https://github.com/easysoft/phpmicro",
+                        "name": "phpmicro"
+                    },
+                    {
+                        "url": "https://github.com/nativephp/php-bin",
+                        "name": "NativePHP"
+                    }
+                ]
+            },
+            "autoload": {
+                "files": [
+                    "src/constants.php"
+                ],
+                "psr-4": {
+                    "Tests\\": "tests/",
+                    "PHPacker\\PHPacker\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "gwleuverink",
+                    "email": "willem@leuver.ink"
+                }
+            ],
+            "description": "Package a PHP script as a standalone cross-platform binary. Convenience wrapper around static-php & phpmicro using general-purpose php binaries",
+            "support": {
+                "issues": "https://github.com/phpacker/phpacker/issues",
+                "source": "https://github.com/phpacker/phpacker/tree/0.6.4"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/gwleuverink",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-11-07T12:35:04+00:00"
+        },
+        {
             "name": "phpdocumentor/reflection-common",
             "version": "2.2.0",
             "source": {
@@ -9528,6 +9612,76 @@
                 }
             ],
             "time": "2024-10-20T05:08:20+00:00"
+        },
+        {
+            "name": "symfony/filesystem",
+            "version": "v7.4.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/filesystem.git",
+                "reference": "d721ea61b4a5fba8c5b6e7c1feda19efea144b50"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/d721ea61b4a5fba8c5b6e7c1feda19efea144b50",
+                "reference": "d721ea61b4a5fba8c5b6e7c1feda19efea144b50",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "symfony/polyfill-ctype": "~1.8",
+                "symfony/polyfill-mbstring": "~1.8"
+            },
+            "require-dev": {
+                "symfony/process": "^6.4|^7.0|^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Filesystem\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides basic utilities for the filesystem",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/filesystem/tree/v7.4.11"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-05-11T16:38:44+00:00"
         },
         {
             "name": "ta-tikoma/phpunit-architecture-test",

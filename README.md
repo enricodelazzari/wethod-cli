@@ -239,6 +239,20 @@ wethod self-update --rollback  # revert to the previous version
 The previous binary is kept as a backup so `--rollback` can restore it. When running from
 source, update with `git pull && composer install` instead.
 
+## Uninstalling
+
+Remove the binary (and, optionally, your stored data) with the built-in command:
+
+```bash
+wethod uninstall              # remove the binary; asks before deleting stored data
+wethod uninstall --keep-data  # remove the binary but keep credentials and cache
+wethod uninstall --force      # skip all confirmation prompts
+```
+
+"Stored data" is the `~/.config/wethod` directory (credentials and the cached spec). If the
+binary lives in a protected location such as `/usr/local/bin`, you may need to remove it
+with `sudo` instead. When running from source, just delete the cloned repository.
+
 ## AI agent skill
 
 The CLI ships with a [Claude](https://claude.com/claude-code) skill that teaches AI coding

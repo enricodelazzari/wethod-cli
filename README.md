@@ -30,7 +30,7 @@ wethod create-client --field name="Acme"
 
 ## Requirements
 
-- **PHP 8.2+** (only required when running from source or via the PHAR)
+- **PHP 8.4+** (only required when running from source or via the PHAR)
 - **Composer** (only required when installing from source)
 
 The prebuilt binaries are self-contained and do **not** require PHP to be installed.

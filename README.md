@@ -37,23 +37,40 @@ The prebuilt binaries are self-contained and do **not** require PHP to be instal
 
 ## Installation
 
-### Prebuilt binary (recommended)
+### Quick install (recommended)
 
-Download the binary for your platform from the
-[latest release](https://github.com/enricodelazzari/wethod-cli/releases/latest), make it
-executable, and put it on your `PATH`:
+Run the one-liner for your operating system. It detects your platform, downloads the right
+binary from the latest release, and puts `wethod` on your `PATH` — no PHP required.
+
+**macOS**
 
 ```bash
-# macOS (Apple Silicon) — adjust the asset name for your platform
-curl -L -o wethod \
-  https://github.com/enricodelazzari/wethod-cli/releases/latest/download/wethod-darwin-arm64
-chmod +x wethod
-sudo mv wethod /usr/local/bin/wethod
-
-wethod --version
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/enricodelazzari/wethod-cli/main/install.sh)"
 ```
 
-Released assets are named `wethod-<version>-<platform>`, where `<platform>` is one of:
+**Linux**
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/enricodelazzari/wethod-cli/main/install.sh)"
+```
+
+**Windows** (PowerShell)
+
+```powershell
+irm https://raw.githubusercontent.com/enricodelazzari/wethod-cli/main/install.ps1 | iex
+```
+
+> Restart your terminal after installation, then run `wethod --version` to confirm.
+
+The installer honours two environment variables: `WETHOD_INSTALL_DIR` (where to put the
+binary) and `WETHOD_VERSION` (a specific release tag instead of the latest).
+
+### Manual download
+
+Prefer not to pipe a script? Download the binary for your platform from the
+[latest release](https://github.com/enricodelazzari/wethod-cli/releases/latest), make it
+executable, and move it onto your `PATH`. Assets are named `wethod-<version>-<platform>`,
+where `<platform>` is one of:
 
 | Platform                | Asset suffix         |
 | ----------------------- | -------------------- |
@@ -63,7 +80,16 @@ Released assets are named `wethod-<version>-<platform>`, where `<platform>` is o
 | Linux (x64)             | `linux-x64`          |
 | Windows (x64)           | `windows-x64.exe`    |
 
-Once installed, the CLI can keep itself up to date with [`wethod self-update`](#updating).
+```bash
+# Example: macOS (Apple Silicon), release 0.0.4
+curl -fSL -o wethod \
+  https://github.com/enricodelazzari/wethod-cli/releases/download/0.0.4/wethod-0.0.4-darwin-arm64
+chmod +x wethod
+sudo mv wethod /usr/local/bin/wethod
+```
+
+However you install it, the CLI can keep itself up to date afterwards with
+[`wethod self-update`](#updating).
 
 ### From source
 

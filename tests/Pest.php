@@ -1,5 +1,8 @@
 <?php
 
+use Laravel\Prompts\Prompt;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +14,35 @@
 |
 */
 
-uses(Tests\TestCase::class)->in('Feature');
+uses(TestCase::class)->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Laravel Prompts fallback
+|--------------------------------------------------------------------------
+|
+| Force Laravel Prompts into their non-interactive fallback so the console
+| testing helpers (expectsQuestion / expectsChoice) can drive prompt-based
+| commands like `login` and `logout`.
+|
+*/
+
+uses()->beforeEach(fn () => Prompt::fallbackWhen(true))->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Test Spec
+|--------------------------------------------------------------------------
+|
+| Point every booted application at a tiny local OpenAPI fixture so the
+| suite never fetches the real spec over the network.
+|
+*/
+
+$specFixture = __DIR__.'/Fixtures/mini-openapi.yaml';
+putenv('WETHOD_SPEC_URL='.$specFixture);
+$_ENV['WETHOD_SPEC_URL'] = $specFixture;
+$_SERVER['WETHOD_SPEC_URL'] = $specFixture;
 
 /*
 |--------------------------------------------------------------------------

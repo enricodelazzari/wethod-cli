@@ -1,18 +1,18 @@
 {
-    "name": "laravel-zero/laravel-zero",
-    "description": "The Laravel Zero Framework.",
-    "keywords": ["framework", "laravel", "laravel zero", "console", "cli"],
-    "homepage": "https://laravel-zero.com",
+    "name": "enricodelazzari/wethod-cli",
+    "description": "A standalone command-line client for the Wethod API, generated from its OpenAPI spec.",
+    "keywords": ["wethod", "cli", "console", "openapi", "laravel zero"],
+    "homepage": "https://github.com/enricodelazzari/wethod-cli",
     "type": "project",
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/laravel-zero/laravel-zero/issues",
-        "source": "https://github.com/laravel-zero/laravel-zero"
+        "issues": "https://github.com/enricodelazzari/wethod-cli/issues",
+        "source": "https://github.com/enricodelazzari/wethod-cli"
     },
     "authors": [
         {
-            "name": "Nuno Maduro",
-            "email": "enunomaduro@gmail.com"
+            "name": "Enrico De Lazzari",
+            "email": "enricodlz@gmail.com"
         }
     ],
     "require": {

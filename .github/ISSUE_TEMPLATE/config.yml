@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Wethod API documentation
+    url: https://docs.wethod.com/getting-started
+    about: Questions about the Wethod API itself (not the CLI).
+  - name: Security vulnerability
+    url: https://github.com/enricodelazzari/wethod-cli/security/advisories/new
+    about: Please report security issues privately, not as public issues.

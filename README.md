@@ -1,8 +1,15 @@
 # Wethod CLI
 
+[![Latest release](https://img.shields.io/github/v/release/enricodelazzari/wethod-cli?sort=semver&style=flat-square)](https://github.com/enricodelazzari/wethod-cli/releases/latest)
+[![Tests](https://github.com/enricodelazzari/wethod-cli/actions/workflows/run-tests.yml/badge.svg)](https://github.com/enricodelazzari/wethod-cli/actions/workflows/run-tests.yml)
+[![PHPStan](https://github.com/enricodelazzari/wethod-cli/actions/workflows/phpstan.yml/badge.svg)](https://github.com/enricodelazzari/wethod-cli/actions/workflows/phpstan.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE.md)
+
 A standalone command-line client for the [Wethod API](https://docs.wethod.com/getting-started),
 built with [Laravel Zero](https://laravel-zero.com) and
 [spatie/laravel-openapi-cli](https://github.com/spatie/laravel-openapi-cli).
+
+![Wethod CLI](art/screenshot.png)
 
 Every endpoint in Wethod's [OpenAPI spec](https://docs.wethod.com/specs/openapi.yaml)
 becomes its own command — there is no hand-written command per endpoint, so the CLI stays
@@ -27,6 +34,11 @@ wethod create-client --field name="Acme"
 - [AI agent skill](#ai-agent-skill)
 - [Development](#development)
 - [How it works](#how-it-works)
+- [Changelog](#changelog)
+- [Contributing](#contributing)
+- [Security vulnerabilities](#security-vulnerabilities)
+- [Credits](#credits)
+- [License](#license)
 
 ## Requirements
 
@@ -293,3 +305,25 @@ The test suite points `WETHOD_SPEC_URL` at a local fixture
   configured, so you get a clear hint instead of a confusing server error.
 
 See [`CLAUDE.md`](CLAUDE.md) for a deeper architecture overview.
+
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
+## Contributing
+
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+
+## Security vulnerabilities
+
+Please review [our security policy](SECURITY.md) on how to report security
+vulnerabilities.
+
+## Credits
+
+- [Enrico De Lazzari](https://github.com/enricodelazzari)
+- [All Contributors](https://github.com/enricodelazzari/wethod-cli/contributors)
+
+## License
+
+The MIT License (MIT). Please see the [License File](LICENSE.md) for more information.

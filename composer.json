@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "cweagans/composer-patches": "^1.7",
         "illuminate/http": "^12.62",
         "laravel-zero/framework": "^12.0.2",
         "spatie/laravel-openapi-cli": "^1.3",
@@ -45,7 +46,16 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
+            "cweagans/composer-patches": true,
             "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "composer-exit-on-patch-failure": true,
+        "patches": {
+            "spatie/laravel-openapi-cli": {
+                "Sanitize multi-line parameter descriptions (upstream PR #9)": "patches/sanitize-multiline-parameter-descriptions.patch"
+            }
         }
     },
     "minimum-stability": "stable",

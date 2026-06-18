@@ -64,6 +64,60 @@ command:
 WETHOD_COMPANY=other-co wethod list-clients --json
 ```
 
+## Fill timesheets from the weekly planning
+
+Fetch allocations for every day of the current work week, resolve project
+names, and create timesheets — optionally skipping unwanted projects (e.g. a
+generic "Buffer" catch-all).
+
+```bash
+# 1. Who am I?
+person_id=$(wethod get-authenticated-person --json | jq '.id')
+
+# 2. Compute Mon–Fri of the current week (ISO weeks start on Monday)
+monday=$(date -v-$(date +%u)d +%Y-%m-%d 2>/dev/null \
+  || date -d "last monday" +%Y-%m-%d)   # macOS || Linux fallback
+days=()
+for i in 0 1 2 3 4; do
+  days+=("$(date -j -v+"$i"d -f "%Y-%m-%d" "$monday" +%Y-%m-%d 2>/dev/null \
+    || date -d "$monday + $i days" +%Y-%m-%d)")
+done
+
+# 3. Collect allocations, skip projects by name
+SKIP_PROJECTS=("Buffer 2026")   # add any project names to exclude
+
+for day in "${days[@]}"; do
+  allocs=$(wethod list-people-allocations \
+    --person-id="$person_id" --date="$day" --json)
+
+  echo "$allocs" | jq -c '.[]' | while read -r alloc; do
+    project_id=$(echo "$alloc" | jq '.project_id')
+    hours=$(echo "$alloc"      | jq '.hours')
+    project_name=$(wethod get-project --id="$project_id" --json | jq -r '.name')
+
+    # Skip excluded projects
+    skip=false
+    for excl in "${SKIP_PROJECTS[@]}"; do
+      [[ "$project_name" == "$excl" ]] && skip=true && break
+    done
+    $skip && echo "Skipping $project_name on $day" && continue
+
+    wethod create-timesheet \
+      --input="{\"project_id\":$project_id,\"person_id\":$person_id,\
+\"date\":\"$day\",\"hours\":$hours,\"mode\":\"DAILY\"}" --json
+    echo "Created timesheet: $project_name — $day — ${hours}h"
+  done
+done
+```
+
+**Notes**:
+- The `date` command syntax differs between macOS and Linux; the snippet
+  includes both variants.
+- Populate `SKIP_PROJECTS` with the exact project names the user wants to
+  exclude (e.g. internal buffer or overhead projects).
+- Run `wethod list-timesheets --date=<day> --person-id=<id> --json` first if
+  you want to check for existing timesheets before creating new ones.
+
 ## Debug a failing call
 
 Print the exact request being sent:

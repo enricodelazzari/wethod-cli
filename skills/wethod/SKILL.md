@@ -50,6 +50,13 @@ Always pass `--json` when you need to extract a value, then parse with `jq`:
 wethod list-clients --limit=1 --json | jq '.[0].id'
 ```
 
+## Date and calendar conventions
+
+- **Weeks run Monday → Friday**. When the user asks for "this week" or "la
+  settimana corrente", compute dates from the most recent Monday through the
+  coming Friday. Never assume Sunday is the first day of the week.
+- Always express dates as `YYYY-MM-DD` in API calls.
+
 ## Known API quirks
 
 - **`--field` sends strings**: `--field project_id=13727` sends the value as a
@@ -62,6 +69,10 @@ wethod list-clients --limit=1 --json | jq '.[0].id'
   accept `DAILY` / `WEEKLY` (uppercase) even though the API returns them as
   `daily` / `weekly` in responses. When in doubt, check the OpenAPI spec cached
   at `~/.config/wethod/cache/` or run `wethod spec:refresh` to re-fetch it.
+- **`get-authenticated-person` may return empty name fields**: `first_name` and
+  `last_name` can both be empty strings even for a valid session. Use the
+  `email` field to identify the user, and the `id` field for subsequent API
+  calls.
 
 ## Errors
 

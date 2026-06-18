@@ -2,6 +2,14 @@
 
 All notable changes to `wethod-cli` will be documented in this file.
 
+## 0.1.3 - 2026-06-18
+
+### What's Changed
+
+* improve skill docs: week convention, name quirk, weekly timesheet workflow by @enricodelazzari in https://github.com/enricodelazzari/wethod-cli/pull/13
+
+**Full Changelog**: https://github.com/enricodelazzari/wethod-cli/compare/0.1.2...0.1.3
+
 ## 0.1.2 - 2026-06-18
 
 ### What's Changed

@@ -2,6 +2,14 @@
 
 All notable changes to `wethod-cli` will be documented in this file.
 
+## 0.1.1 - 2026-06-18
+
+### What's Changed
+
+* docs(skill): document --field/--input and enum API quirks by @enricodelazzari in https://github.com/enricodelazzari/wethod-cli/pull/11
+
+**Full Changelog**: https://github.com/enricodelazzari/wethod-cli/compare/0.1.0...0.1.1
+
 ## 0.1.0 - 2026-06-16
 
 ### What's Changed

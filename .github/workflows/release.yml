@@ -62,6 +62,13 @@ jobs:
           mv linux/linux-x64 wethod-${{ env.VERSION }}-linux-x64
           mv windows/windows-x64.exe wethod-${{ env.VERSION }}-windows-x64.exe
 
+      - name: Generate checksums
+        run: |
+          cd builds/build
+          for binary in wethod-${{ env.VERSION }}-*; do
+            sha256sum "$binary" > "$binary.sha256"
+          done
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -77,6 +84,11 @@ jobs:
             wethod-${{ env.VERSION }}-darwin-x64 \
             wethod-${{ env.VERSION }}-linux-arm64 \
             wethod-${{ env.VERSION }}-linux-x64 \
-            wethod-${{ env.VERSION }}-windows-x64.exe
+            wethod-${{ env.VERSION }}-windows-x64.exe \
+            wethod-${{ env.VERSION }}-darwin-arm64.sha256 \
+            wethod-${{ env.VERSION }}-darwin-x64.sha256 \
+            wethod-${{ env.VERSION }}-linux-arm64.sha256 \
+            wethod-${{ env.VERSION }}-linux-x64.sha256 \
+            wethod-${{ env.VERSION }}-windows-x64.exe.sha256
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

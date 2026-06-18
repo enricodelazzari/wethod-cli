@@ -113,33 +113,167 @@ class SelfUpdateCommand extends Command
             return self::FAILURE;
         }
 
-        $binary = spin(
-            callback: fn (): string => Http::withOptions(['sink' => null])->get($downloadUrl)->body(),
+        $expectedHash = $this->fetchExpectedChecksum($release['assets'], $assetName);
+
+        $currentPath = $this->getCurrentBinaryPath();
+        $tmpPath = $currentPath.'.download';
+
+        $downloaded = spin(
+            callback: fn (): bool => $this->downloadTo($downloadUrl, $tmpPath),
             message: 'Downloading...'
         );
 
-        if (empty($binary)) {
+        if (! $downloaded) {
+            @unlink($tmpPath);
             error('Failed to download the update.');
 
             return self::FAILURE;
         }
 
-        $currentPath = $this->getCurrentBinaryPath();
+        // Verify integrity before touching the installed binary so a corrupt or
+        // truncated download can never replace a working install.
+        if ($expectedHash !== null && ! hash_equals($expectedHash, (string) hash_file('sha256', $tmpPath))) {
+            @unlink($tmpPath);
+            error('Checksum verification failed; the download is corrupted. Update aborted.');
+
+            return self::FAILURE;
+        }
+
+        if (! $this->looksLikeExecutable($tmpPath, $platform)) {
+            @unlink($tmpPath);
+            error('The downloaded file is not a valid executable. Update aborted.');
+
+            return self::FAILURE;
+        }
+
+        if ($expectedHash === null) {
+            note('No published checksum found for this release; skipped checksum verification.');
+        }
+
         $backupPath = $currentPath.'.old';
 
         if (file_exists($backupPath)) {
             unlink($backupPath);
         }
 
-        rename($currentPath, $backupPath);
+        // Keep the running binary in place by copying (not moving) it to the
+        // backup, then swap the verified download in with an atomic rename.
+        if (! @copy($currentPath, $backupPath)) {
+            @unlink($tmpPath);
+            error('Could not create a backup of the current binary. Update aborted.');
 
-        file_put_contents($currentPath, $binary);
-        chmod($currentPath, 0755);
+            return self::FAILURE;
+        }
+
+        chmod($tmpPath, 0755);
+
+        if (! @rename($tmpPath, $currentPath)) {
+            @unlink($tmpPath);
+            error('Could not install the update. Your existing binary is unchanged.');
+
+            return self::FAILURE;
+        }
 
         outro("Successfully updated to {$version}!");
         note('Run `wethod self-update --rollback` to revert if needed.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Stream the asset straight to disk, returning false on any HTTP or
+     * transport error so the caller never writes a bad response to the binary.
+     */
+    private function downloadTo(string $url, string $path): bool
+    {
+        try {
+            $response = Http::withHeaders(['User-Agent' => 'wethod-cli'])
+                ->timeout(300)
+                ->sink($path)
+                ->get($url);
+        } catch (\Throwable) {
+            return false;
+        }
+
+        if ($response->failed()) {
+            return false;
+        }
+
+        return file_exists($path) && filesize($path) > 0;
+    }
+
+    /**
+     * Fetch the expected SHA-256 for an asset from its companion `.sha256`
+     * release file. Returns null when no checksum is published.
+     *
+     * @param  array<array{name: string, browser_download_url: string}>  $assets
+     */
+    private function fetchExpectedChecksum(array $assets, string $assetName): ?string
+    {
+        $url = $this->findAssetUrl($assets, $assetName.'.sha256');
+
+        if ($url === null) {
+            return null;
+        }
+
+        try {
+            $response = Http::withHeaders(['User-Agent' => 'wethod-cli'])->timeout(30)->get($url);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        // Accept either a bare hex digest or `sha256sum` format (`<hash>  <file>`).
+        $token = strtok(trim($response->body()), " \t\n");
+
+        if ($token === false || strlen($token) !== 64 || ! ctype_xdigit($token)) {
+            return null;
+        }
+
+        return strtolower($token);
+    }
+
+    /**
+     * Sanity-check the magic bytes so a non-executable payload (an HTML error
+     * page, JSON, a half-written file) is never installed.
+     */
+    private function looksLikeExecutable(string $path, string $platform): bool
+    {
+        $handle = @fopen($path, 'rb');
+
+        if ($handle === false) {
+            return false;
+        }
+
+        $magic = fread($handle, 4);
+        fclose($handle);
+
+        if ($magic === false || strlen($magic) < 4) {
+            return false;
+        }
+
+        /** @var array<int, int> $bytes */
+        $bytes = array_values((array) unpack('C4', $magic));
+
+        if (str_starts_with($platform, 'windows')) {
+            return $bytes[0] === 0x4D && $bytes[1] === 0x5A; // "MZ"
+        }
+
+        if (str_starts_with($platform, 'darwin')) {
+            // Mach-O thin (feedface/feedfacf) or universal (cafebabe), either endianness.
+            $machoMagics = [
+                [0xFE, 0xED, 0xFA, 0xCE], [0xCE, 0xFA, 0xED, 0xFE],
+                [0xFE, 0xED, 0xFA, 0xCF], [0xCF, 0xFA, 0xED, 0xFE],
+                [0xCA, 0xFE, 0xBA, 0xBE], [0xBE, 0xBA, 0xFE, 0xCA],
+            ];
+
+            return in_array($bytes, $machoMagics, true);
+        }
+
+        return $bytes === [0x7F, 0x45, 0x4C, 0x46]; // ELF "\x7fELF"
     }
 
     private function detectPlatform(): string
@@ -190,6 +324,12 @@ class SelfUpdateCommand extends Command
 
     private function getCurrentBinaryPath(): string
     {
+        $override = getenv('WETHOD_BINARY_PATH');
+
+        if (is_string($override) && $override !== '') {
+            return $override;
+        }
+
         if (\Phar::running(false)) {
             return \Phar::running(false);
         }

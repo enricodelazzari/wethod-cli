@@ -50,6 +50,19 @@ Always pass `--json` when you need to extract a value, then parse with `jq`:
 wethod list-clients --limit=1 --json | jq '.[0].id'
 ```
 
+## Known API quirks
+
+- **`--field` sends strings**: `--field project_id=13727` sends the value as a
+  string, which fails for integer fields. Always use `--input` with raw JSON
+  when the body contains integers, floats, or enums:
+  ```bash
+  wethod create-timesheet --input='{"project_id":13727,"person_id":617,"date":"2026-06-18","hours":4,"mode":"DAILY"}'
+  ```
+- **Enum values are uppercase in input**: fields like `mode` on timesheets
+  accept `DAILY` / `WEEKLY` (uppercase) even though the API returns them as
+  `daily` / `weekly` in responses. When in doubt, check the OpenAPI spec cached
+  at `~/.config/wethod/cache/` or run `wethod spec:refresh` to re-fetch it.
+
 ## Errors
 
 - "No Wethod credentials configured" / a 401 warning → the user must run

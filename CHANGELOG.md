@@ -2,6 +2,14 @@
 
 All notable changes to `wethod-cli` will be documented in this file.
 
+## 0.1.5 - 2026-06-22
+
+### What's Changed
+
+* docs(wethod): canonical weekly hours aggregation + float-safe sums by @enricodelazzari in https://github.com/enricodelazzari/wethod-cli/pull/16
+
+**Full Changelog**: https://github.com/enricodelazzari/wethod-cli/compare/0.1.4...0.1.5
+
 ## 0.1.4 - 2026-06-22
 
 ### What's Changed

@@ -84,7 +84,7 @@ for i in 0 1 2 3 4; do
 done
 
 # 3. Collect allocations, skip projects by name
-SKIP_PROJECTS=("Buffer 2026")   # add any project names to exclude
+SKIP_PROJECTS=("Internal Buffer")   # add any project names to exclude
 
 for day in "${days[@]}"; do
   allocs=$(wethod list-people-allocations \
@@ -117,6 +117,53 @@ done
   exclude (e.g. internal buffer or overhead projects).
 - Run `wethod list-timesheets --date=<day> --person-id=<id> --json` first if
   you want to check for existing timesheets before creating new ones.
+
+## Hours on a specific project this week (filter by name keyword)
+
+Build on the weekly planning recipe above, then filter by a case-insensitive
+keyword (e.g. "sense"). Do **not** search by project ID upfront — the user may
+have allocations across multiple projects whose names share the same keyword.
+
+```bash
+# 1. Get person ID
+person_id=$(wethod get-authenticated-person --json | jq '.id')
+
+# 2. Fetch allocations Mon–Fri of THIS week
+monday=$(date -v-$(( $(date +%u) - 1 ))d +%Y-%m-%d 2>/dev/null \
+  || date -d "last monday" +%Y-%m-%d)
+
+allocs=$(for i in 0 1 2 3 4; do
+  day=$(date -j -f "%Y-%m-%d" -v+${i}d "$monday" +%Y-%m-%d 2>/dev/null \
+    || date -d "$monday +${i} days" +%Y-%m-%d)
+  wethod list-people-allocations --person-id="$person_id" --date="$day" --json
+done | jq -s 'flatten')
+
+# 3. Resolve unique project names
+declare -A proj_names
+for pid in $(echo "$allocs" | jq '[.[].project_id] | unique | .[]'); do
+  proj_names[$pid]=$(wethod get-project --id="$pid" --json | jq -r '.name')
+done
+
+# 4. Filter by keyword and print table
+keyword="acme"   # replace with user's keyword
+echo "| Giorno | Progetto | Ore |"
+echo "|--------|----------|-----|"
+total=0
+while read -r day pid hours; do
+  name="${proj_names[$pid]}"
+  if echo "$name" | grep -qi "$keyword"; then
+    echo "| $day | $name | ${hours}h |"
+    total=$((total + hours))
+  fi
+done < <(echo "$allocs" | jq -r '.[] | "\(.date) \(.project_id) \(.hours)"')
+echo "Totale ore su '$keyword': ${total}h"
+```
+
+**Why this approach:** `list-people-allocations` has no name-search parameter.
+A user can have hours split across multiple projects sharing the same keyword
+(e.g. "Acme | platform 2026" and "Acme platform maintenance"), so pre-filtering
+by a single project ID would return incomplete results. Always fetch all
+allocations for the week first, then filter client-side.
 
 ## Debug a failing call
 

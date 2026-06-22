@@ -73,6 +73,11 @@ wethod list-clients --limit=1 --json | jq '.[0].id'
   `last_name` can both be empty strings even for a valid session. Use the
   `email` field to identify the user, and the `id` field for subsequent API
   calls.
+- **`hours` is integer for planning but float for timesheets**: people
+  allocations (planning) report `hours` as an integer (0–8); timesheet hours are
+  floats (e.g. `15.6`). When you sum hours, do it in `jq` (`map(.hours) | add`),
+  not with bash integer arithmetic (`$((a + b))`) — the latter silently
+  truncates or errors on fractional timesheet hours.
 
 ## Errors
 

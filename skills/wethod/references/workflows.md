@@ -84,7 +84,7 @@ for i in 0 1 2 3 4; do
 done
 
 # 3. Collect allocations, skip projects by name
-SKIP_PROJECTS=("Buffer 2026")   # add any project names to exclude
+SKIP_PROJECTS=("Internal Buffer")   # add any project names to exclude
 
 for day in "${days[@]}"; do
   allocs=$(wethod list-people-allocations \
@@ -145,7 +145,7 @@ for pid in $(echo "$allocs" | jq '[.[].project_id] | unique | .[]'); do
 done
 
 # 4. Filter by keyword and print table
-keyword="sense"   # replace with user's keyword
+keyword="acme"   # replace with user's keyword
 echo "| Giorno | Progetto | Ore |"
 echo "|--------|----------|-----|"
 total=0
@@ -161,7 +161,7 @@ echo "Totale ore su '$keyword': ${total}h"
 
 **Why this approach:** `list-people-allocations` has no name-search parameter.
 A user can have hours split across multiple projects sharing the same keyword
-(e.g. "SNAM | maize.SENSE 2026" and "MAIZE.Sense | 2026"), so pre-filtering
+(e.g. "Acme | platform 2026" and "Acme platform maintenance"), so pre-filtering
 by a single project ID would return incomplete results. Always fetch all
 allocations for the week first, then filter client-side.
 

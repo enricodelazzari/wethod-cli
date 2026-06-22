@@ -118,6 +118,61 @@ done
 - Run `wethod list-timesheets --date=<day> --person-id=<id> --json` first if
   you want to check for existing timesheets before creating new ones.
 
+## Summarize planned hours for the week (one authoritative pass)
+
+When the user asks "how many hours did I plan this week" (or per project),
+produce a **single canonical aggregation** and report from it — do not eyeball
+the raw rows and narrate per-day attributions by hand. Building the total,
+the per-day breakdown, and the per-project breakdown in one `jq` pass keeps the
+numbers self-consistent and avoids misattributing hours to the wrong day or
+project.
+
+```bash
+person_id=$(wethod get-authenticated-person --json | jq '.id')
+
+# Mon–Fri of the current week (weeks run Mon→Fri; see SKILL.md)
+monday=$(date -v-$(( $(date +%u) - 1 ))d +%Y-%m-%d 2>/dev/null \
+  || date -d "last monday" +%Y-%m-%d)
+friday=$(date -j -f "%Y-%m-%d" -v+4d "$monday" +%Y-%m-%d 2>/dev/null \
+  || date -d "$monday +4 days" +%Y-%m-%d)
+
+# Collect every allocation for the person (page until short), filter to the week
+allocs=$(offset=0; out="[]"
+  while :; do
+    page=$(wethod list-people-allocations \
+      --person-id="$person_id" --limit=100 --offset="$offset" --json)
+    out=$(jq -s '.[0]+.[1]' <(echo "$out") <(echo "$page"))
+    [ "$(echo "$page" | jq 'length')" -lt 100 ] && break
+    offset=$((offset + 100))
+  done
+  echo "$out" | jq --arg a "$monday" --arg b "$friday" \
+    'map(select(.date >= $a and .date <= $b))')
+
+# Resolve project names into a {id: name} map
+names=$(for pid in $(echo "$allocs" | jq '[.[].project_id] | unique | .[]'); do
+    jq -n --arg id "$pid" \
+      --arg name "$(wethod get-project --id="$pid" --json | jq -r '.name')" \
+      '{($id): $name}'
+  done | jq -s 'add // {}')
+
+# One authoritative aggregation: total + by-day + by-project
+jq -n --argjson allocs "$allocs" --argjson names "$names" '
+  ($allocs | map(. + {project: ($names[(.project_id|tostring)] // "?")})) as $a
+  | {
+      total_hours: ($a | map(.hours) | add // 0),
+      by_day:     ($a | group_by(.date)
+                     | map({date: .[0].date,
+                            hours: (map(.hours)|add),
+                            projects: (map(.project)|unique)})),
+      by_project: ($a | group_by(.project)
+                     | map({project: .[0].project, hours: (map(.hours)|add)})
+                     | sort_by(-.hours))
+    }'
+```
+
+Report the table straight from this JSON. For "hours on Sense", read the
+matching rows out of `by_project` instead of re-summing by hand.
+
 ## Hours on a specific project this week (filter by name keyword)
 
 Build on the weekly planning recipe above, then filter by a case-insensitive
@@ -148,14 +203,16 @@ done
 keyword="acme"   # replace with user's keyword
 echo "| Giorno | Progetto | Ore |"
 echo "|--------|----------|-----|"
-total=0
+matched="[]"
 while read -r day pid hours; do
   name="${proj_names[$pid]}"
   if echo "$name" | grep -qi "$keyword"; then
     echo "| $day | $name | ${hours}h |"
-    total=$((total + hours))
+    matched=$(jq -c --argjson h "$hours" '. + [$h]' <<<"$matched")
   fi
 done < <(echo "$allocs" | jq -r '.[] | "\(.date) \(.project_id) \(.hours)"')
+# Sum in jq so fractional timesheet hours are preserved (see SKILL.md quirks)
+total=$(jq 'add // 0' <<<"$matched")
 echo "Totale ore su '$keyword': ${total}h"
 ```
 

@@ -2,6 +2,10 @@
 
 All notable changes to `wethod-cli` will be documented in this file.
 
+## 0.1.6 - 2026-06-22
+
+**Full Changelog**: https://github.com/enricodelazzari/wethod-cli/compare/0.1.5...0.1.6
+
 ## 0.1.5 - 2026-06-22
 
 ### What's Changed

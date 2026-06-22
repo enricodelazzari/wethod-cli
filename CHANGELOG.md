@@ -2,6 +2,15 @@
 
 All notable changes to `wethod-cli` will be documented in this file.
 
+## 0.1.4 - 2026-06-22
+
+### What's Changed
+
+* build(deps): bump actions/checkout from 6 to 7 by @dependabot[bot] in https://github.com/enricodelazzari/wethod-cli/pull/14
+* feat(skill): add wethod skill with weekly planning by keyword by @enricodelazzari in https://github.com/enricodelazzari/wethod-cli/pull/15
+
+**Full Changelog**: https://github.com/enricodelazzari/wethod-cli/compare/0.1.3...0.1.4
+
 ## 0.1.3 - 2026-06-18
 
 ### What's Changed

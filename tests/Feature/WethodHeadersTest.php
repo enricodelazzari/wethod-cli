@@ -25,3 +25,19 @@ it('sends the bearer token and required Wethod headers', function () {
 it('registers a command for each operation in the spec', function () {
     $this->artisan('list-clients', ['--help' => true])->assertExitCode(0);
 });
+
+it('keeps options whose OpenAPI description spans multiple lines', function () {
+    config([
+        'wethod.token' => 'secret-token',
+        'wethod.company' => 'acme',
+        'wethod.version' => '2024-06-15',
+    ]);
+
+    Http::fake([
+        'api.wethod.com/*' => Http::response([], 200),
+    ]);
+
+    $this->artisan('list-clients', ['--search' => 'acme'])->assertExitCode(0);
+
+    Http::assertSent(fn ($request) => $request->url() === 'https://api.wethod.com/api/clients?search=acme');
+});

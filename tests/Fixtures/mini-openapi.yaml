@@ -16,6 +16,15 @@ paths:
           required: false
           schema:
             type: integer
+        - name: search
+          in: query
+          required: false
+          description: |
+            Free-text search across client names.
+
+            Matching is case-insensitive and supports {partial} terms.
+          schema:
+            type: string
         - name: Wethod-Company
           in: header
           required: true

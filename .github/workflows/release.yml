@@ -2,7 +2,7 @@ name: release
 
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
@@ -25,7 +25,14 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           else
-            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+            echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          fi
+
+      - name: Fail fast when the version could not be resolved
+        run: |
+          if [ -z "${{ env.VERSION }}" ]; then
+            echo "::error::VERSION is empty; refusing to build"
+            exit 1
           fi
 
       - name: Checkout code

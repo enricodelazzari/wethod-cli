@@ -2,6 +2,14 @@
 
 All notable changes to `wethod-cli` will be documented in this file.
 
+## 0.1.7 - 2026-09-18
+
+### What's Changed
+
+* chore(deps): drop local patch for spatie/laravel-openapi-cli by @enricodelazzari in https://github.com/enricodelazzari/wethod-cli/pull/17
+
+**Full Changelog**: https://github.com/enricodelazzari/wethod-cli/compare/0.1.6...0.1.7
+
 ## 0.1.6 - 2026-06-22
 
 **Full Changelog**: https://github.com/enricodelazzari/wethod-cli/compare/0.1.5...0.1.6
